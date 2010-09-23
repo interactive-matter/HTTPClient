@@ -22,13 +22,14 @@
  *      Author: marcus
  */
 #include <avr/pgmspace.h>
+#include <HardwareSerial.h>
 
 #include "HTTPClient.h"
 
 //the prototypes for the different requests
-prog_char GET_REQUEST[] = "GET %s HTTP/1.1\nAccept: */*\n";
+char GET_REQUEST[] = "GET %s HTTP/1.1\nAccept: */*\n\n";
 //TODO is that correct ?
-prog_char POST_REQUEST[] = "POST %s HTTP/1.1\nAccept: */*\n";
+prog_char POST_REQUEST[] = "POST %s HTTP/1.1\nAccept: */*\n\n";
 
 //helper function to ignore the HTTP Result Header
 FILE* skipHeader(FILE* stream);
@@ -44,16 +45,15 @@ FILE*
 HTTPClient::getURI(char* uri)
 {
   FILE* result = openClientFile();
-  fprintf_P(result,uri);
+  fprintf(result,GET_REQUEST,uri);
   result = skipHeader(result);
-  //read for the big time
   return result;
 }
 
 FILE*
 HTTPClient::openClientFile()
 {
-  FILE* result = fdevopen(&clientWrite, &clientRead);
+  FILE* result = fdevopen(clientWrite, clientRead);
   if (result==NULL) {
       return NULL;
   }
@@ -65,17 +65,18 @@ HTTPClient::openClientFile()
 int
 HTTPClient::clientWrite(char byte, FILE* stream)
 {
-  HTTPClient* client = (HTTPClient*) stream->udata;
+  HTTPClient* client = (HTTPClient*) fdev_get_udata(stream);
   client->write(byte);
+	Serial.print(byte);
   return 0;
 }
 
 int
 HTTPClient::clientRead(FILE* stream)
 {
-  HTTPClient* client = (HTTPClient*) stream->udata;
+  HTTPClient* client = (HTTPClient*) fdev_get_udata(stream);
   //block until we got a byte
-  while (!client->available())
+  while (client->available()==0)
     {
       //do nothing
     };
@@ -84,11 +85,21 @@ HTTPClient::clientRead(FILE* stream)
 
 FILE* skipHeader(FILE* stream) {
   //skip over the header
-    int inByte = 0;
-    int lastByte = 0;
+    static int inByte = 0;
+    static int lastByte = 0;
     while (!(inByte=='\n' && lastByte=='\n')) {
+		//by that we ignore \r
+		if (inByte!='\r') {
        lastByte=inByte;
+		}
        inByte = fgetc(stream);
+		if (inByte!='\n') {
+		Serial.print((char)inByte);
+			Serial.print(inByte);
+		} else {
+			Serial.print(inByte);
+			Serial.println('.');
+		}
        if (inByte == EOF) {
            //hmm, an error occured - lets just end this
            HTTPClient::closeStream(stream);

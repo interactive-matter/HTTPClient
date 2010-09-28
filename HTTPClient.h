@@ -31,13 +31,17 @@
 
 class HTTPClient: private Client {
 private:
+  char* hostName;
+  uint8_t hostIp;
+
   FILE* openClientFile();
   static int clientWrite(char byte, FILE* stream);
   static int clientRead(FILE* stream);
 public:
-  HTTPClient(uint8_t * ip, uint16_t port);
+  HTTPClient(char* host, uint8_t* ip, uint16_t port);
   FILE* getURI(char* uri);
-  FILE* postURI(char* uri, FILE* content);
+  FILE* getURI(char* uri, char* headers);
+  FILE* postURI(char* uri);
   static void closeStream(FILE* stream);
 };
 

@@ -22,31 +22,50 @@
  *      Author: marcus
  */
 #include <avr/pgmspace.h>
+#include <EthernetDNS.h>
 #include <HardwareSerial.h>
 
 #include "HTTPClient.h"
-
-//the prototypes for the different requests
-char GET_REQUEST[] = "GET %s HTTP/1.1\nAccept: */*\n\n";
-//TODO is that correct ?
-prog_char POST_REQUEST[] = "POST %s HTTP/1.1\nAccept: */*\n\n";
 
 //helper function to ignore the HTTP Result Header
 FILE* skipHeader(FILE* stream);
 
 
-HTTPClient::HTTPClient(uint8_t* ip, uint16_t port) :
+HTTPClient::HTTPClient(char*host, uint8_t* ip, uint16_t port) :
   Client(ip, port)
 {
-  //anyting else to do?
+  this->hostName=host;
 }
 
 FILE*
 HTTPClient::getURI(char* uri)
 {
+  return getURI(uri,NULL);
+}
+
+FILE*
+HTTPClient::getURI(char* uri,char* headers)
+{
   FILE* result = openClientFile();
-  fprintf(result,GET_REQUEST,uri);
+  //the request and the default headers
+  fprintf_P(result,PSTR("GET %s HTTP/1.1\nHost %s\nAccept: */*\n"),uri,hostName);
+  //is there an additional header?
+  if (headers!=NULL) {
+      fprintf(result,headers);
+  }
+  //ok finished
+  fprintf_P(result,"\n");
   result = skipHeader(result);
+  return result;
+}
+
+FILE*
+HTTPClient::postURI(char* uri)
+{
+  FILE* result = openClientFile();
+  fprintf_P(result,PSTR("POST %s HTTP/1.1\nHost %s\nAccept: */*\n\n"),uri,hostName);
+  result = skipHeader(result);
+  //TODO where and how to write the parameters
   return result;
 }
 

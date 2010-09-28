@@ -22,6 +22,7 @@
  *      Author: marcus
  */
 #include <avr/pgmspace.h>
+#include <EthernetDns.h>
 #include <HardwareSerial.h>
 
 #include "HTTPClient.h"
@@ -38,7 +39,7 @@ FILE* skipHeader(FILE* stream);
 HTTPClient::HTTPClient(uint8_t* ip, uint16_t port) :
   Client(ip, port)
 {
-  //anyting else to do?
+  self->
 }
 
 FILE*

@@ -37,6 +37,8 @@ private:
   FILE* openClientFile();
   static int clientWrite(char byte, FILE* stream);
   static int clientRead(FILE* stream);
+	uint8_t * host_ip
+	char* host_name;
 public:
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
   FILE* getURI(char* uri);

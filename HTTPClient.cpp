@@ -22,7 +22,6 @@
  *      Author: marcus
  */
 #include <avr/pgmspace.h>
-#include <EthernetDNS.h>
 #include <HardwareSerial.h>
 
 #include "HTTPClient.h"

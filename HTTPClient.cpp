@@ -21,6 +21,8 @@
  *  Created on: 18.09.2010
  *      Author: marcus
  */
+#include <stdio.h>
+#include <stdlib.h>
 #include <avr/pgmspace.h>
 #include <HardwareSerial.h>
 
@@ -28,6 +30,12 @@
 
 //helper function to ignore the HTTP Result Header
 FILE* skipHeader(FILE* stream);
+
+//a struct to store the uriEncoder & the handle to the http client
+typedef struct {
+  HTTPClient* client;
+  FILE* encoderStream;
+} http_stream_udata;
 
 
 HTTPClient::HTTPClient(char*host, uint8_t* ip, uint16_t port) :
@@ -59,7 +67,7 @@ HTTPClient::getURI(char* uri,char* headers)
 }
 
 FILE*
-HTTPClient::postURI(char* uri)
+HTTPClient::postURI(char* uri, char* data)
 {
   FILE* result = openClientFile();
   fprintf_P(result,PSTR("POST %s HTTP/1.1\nHost %s\nAccept: */*\n\n"),uri,hostName);
@@ -75,7 +83,10 @@ HTTPClient::openClientFile()
   if (result==NULL) {
       return NULL;
   }
-  fdev_set_udata(result,this);
+  http_stream_udata* udata = (http_stream_udata*) malloc(sizeof(http_stream_udata));
+  udata->client=this;
+  udata->encoderStream=uriEncodeStream(result);
+  fdev_set_udata(result,udata);
   connect();
   return result;
 }
@@ -83,7 +94,8 @@ HTTPClient::openClientFile()
 int
 HTTPClient::clientWrite(char byte, FILE* stream)
 {
-  HTTPClient* client = (HTTPClient*) fdev_get_udata(stream);
+  http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
+  HTTPClient* client = udata->client;
   client->write(byte);
 	Serial.print(byte);
   return 0;
@@ -92,7 +104,8 @@ HTTPClient::clientWrite(char byte, FILE* stream)
 int
 HTTPClient::clientRead(FILE* stream)
 {
-  HTTPClient* client = (HTTPClient*) fdev_get_udata(stream);
+  http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
+  HTTPClient* client = udata->client;
   //block until we got a byte
   while (client->available()==0)
     {
@@ -131,4 +144,56 @@ void HTTPClient::closeStream(FILE* stream) {
   HTTPClient* client = (HTTPClient*) stream->udata;
   client->stop();
   fclose(stream);
+}
+
+#define URI_ALLOWED(byte) ((byte>='A' && byte<='Z') || (byte>='a' && byte<='z') || (byte>='0' && byte<='9') || byte == '-' || byte == '_' || byte == '.' || byte == '~')
+//TODO - no close - so an memory leak - but how to close it??
+FILE* HTTPClient::uriEncodeStream(FILE* stream) {
+  FILE* encodedStream = fdevopen(uriEncodedWrite, uriEncodedRead);
+  fdev_set_udata(encodedStream,stream);
+  return encodedStream;
+}
+
+int HTTPClient::uriEncodedWrite(char byte, FILE* stream) {
+  FILE* origStream = (FILE*) fdev_get_udata(stream);
+  //is is and allowed char?
+  if URI_ALLOWED(byte) {
+      return origStream->put(byte,origStream);
+  } else {
+      char encoded[4] = {0,0,0};
+      sprintf(encoded,"%%%02xc",byte);
+      for (char i =0; i<4; i++) {
+          int result = origStream->put(byte,origStream);
+          if (result==EOF) {
+              return result;
+          }
+      }
+  }
+}
+
+int HTTPClient::uriEncodedRead(FILE* stream) {
+  FILE* origStream = (FILE*) fdev_get_udata(stream);
+  int result = origStream->get(stream);
+  if (result==EOF) {
+      return EOF;
+  }
+  if (result!='%') {
+      return result;
+  } else {
+      char return_value=0;
+      for (char i; i<2; i++) {
+          result = origStream->get(stream);
+          if (result==EOF) {
+              return EOF;
+          }
+          if (result>='A' && result<='Z') {
+              return_value += (1-i)*16*(result-'A');
+          } else if (result>='a' && result<='z') {
+              return_value += (1-i)*16*(result-'a');
+          } else if (result>='0' && result<='9') {
+              return_value += (1-i)*16*(result-'0');
+          }
+      }
+      return return_value;
+  }
 }

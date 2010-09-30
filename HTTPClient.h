@@ -26,7 +26,6 @@
 #define HTTPCLIENT_H_
 
 #include <inttypes.h>
-#include <stdio.h>
 #include "Client.h"
 
 class HTTPClient: private Client {
@@ -37,13 +36,15 @@ private:
   FILE* openClientFile();
   static int clientWrite(char byte, FILE* stream);
   static int clientRead(FILE* stream);
-	uint8_t * host_ip
-	char* host_name;
+  FILE* uriEncodeStream(FILE* stream);
+  static int uriEncodedWrite(char byte, FILE* stream);
+  static int uriEncodedRead(FILE* stream);
+  int uriEncodedStringLength(char* string);
 public:
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
   FILE* getURI(char* uri);
   FILE* getURI(char* uri, char* headers);
-  FILE* postURI(char* uri);
+  FILE* postURI(char* uri,char* data);
   static void closeStream(FILE* stream);
 };
 

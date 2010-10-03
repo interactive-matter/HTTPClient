@@ -232,7 +232,7 @@ HTTPClient::clientRead(FILE* stream)
   int result = client->read();
   //as long as we do not read encoded or it is no % everything is ok
   if (udata->encode==0 || result != '%') {
-      return client->read();
+      return result;
   } else {
           char return_value = 0;
           for (char i = 0; i < 2; i++)

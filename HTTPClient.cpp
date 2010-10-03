@@ -198,12 +198,15 @@ sendContentPayload(FILE* stream, char* data)
   //calculate the content length
   int content_length = 0;
   Serial.print("Payload: ");
-  Serial.println(data);
+  Serial.print(data);
+  Serial.print(" (");
+  Serial.print(strlen(data));
+  Serial.println(")");
   if (data != NULL)
     {
       content_length = strlen(data);
     }
-  fprintf_P(stream, PSTR("Content-Length: %i"), content_length);
+  fprintf_P(stream, PSTR("Content-Length: %i\n"), content_length);
   //ok finished header
   fprintf_P(stream, PSTR("\n"));
   //now sending data

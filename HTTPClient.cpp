@@ -74,7 +74,7 @@ HTTPClient::getURI(char* uri, uri_parameter parameters[], char* headers)
   //the request and the default headers
   fprintf_P(result, PSTR("GET "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
-  //ok finished
+  //ok header finished
   fprintf_P(result, PSTR("\n"));
   skipHeader(result);
 
@@ -98,6 +98,32 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* hea
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("POST "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
+  //ok header finished
+  fprintf_P(result, PSTR("\n"));
+  sendContentPayload(result, data);
+  skipHeader(result);
+  return result;
+}
+
+FILE*
+HTTPClient::putURI(char* uri, char* data)
+{
+  return postURI(uri, NULL, data, NULL);
+}
+FILE*
+HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data)
+{
+  return postURI(uri, parameters, data, NULL);
+}
+
+FILE*
+HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data, char* headers)
+{
+  FILE* result = openClientFile();
+  fprintf_P(result, PSTR("PUT "));
+  sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
+  //ok header finished
+  fprintf_P(result, PSTR("\n"));
   sendContentPayload(result, data);
   skipHeader(result);
   return result;

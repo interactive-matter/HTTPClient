@@ -227,7 +227,9 @@ HTTPClient::clientRead(FILE* stream)
   //block until we got a byte
   while (client->available() == 0)
     {
-      //do nothing
+      if (client->connected()==0) {
+          return EOF;
+      }
     };
   int result = client->read();
   if (result == EOF)
@@ -238,6 +240,13 @@ HTTPClient::clientRead(FILE* stream)
   else if (udata->encode==0 || result != '%') {
       return result;
   } else {
+      //block until we got the needed bytes
+      while (client->available() >= 2)
+        {
+          if (client->connected()==0) {
+              return EOF;
+          }
+        };
           char return_value = 0;
           for (char i = 0; i < 2; i++)
             {

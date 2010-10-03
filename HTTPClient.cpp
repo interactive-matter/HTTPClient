@@ -55,13 +55,13 @@ HTTPClient::getURI(char* uri,char* headers)
 {
   FILE* result = openClientFile();
   //the request and the default headers
-  fprintf_P(result,PSTR("GET %s HTTP/1.1\nHost %s\nAccept: */*\n"),uri,hostName);
+  fprintf_P(result,PSTR("GET %s HTTP/1.1\nHost: %s\nAccept: */*\n"),uri,hostName);
   //is there an additional header?
   if (headers!=NULL) {
       fprintf(result,headers);
   }
   //ok finished
-  fprintf_P(result,"\n");
+  fprintf_P(result,PSTR("\n"));
   result = skipHeader(result);
   return result;
 }
@@ -70,7 +70,7 @@ FILE*
 HTTPClient::postURI(char* uri, char* data)
 {
   FILE* result = openClientFile();
-  fprintf_P(result,PSTR("POST %s HTTP/1.1\nHost %s\nAccept: */*\n\n"),uri,hostName);
+  fprintf_P(result,PSTR("POST %s HTTP/1.1\nHost: %s\nAccept: */*\n\n"),uri,hostName);
   result = skipHeader(result);
   //TODO where and how to write the parameters
   return result;

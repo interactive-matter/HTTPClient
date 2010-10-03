@@ -213,7 +213,7 @@ int uriEncodedWrite(char byte, FILE* stream)
       sprintf(encoded,"%%%02xc",byte);
       for (char i =0; i<4; i++)
         {
-          int result = origStream->put(byte,origStream);
+          int result = origStream->put(encoded[i],origStream);
           if (result==EOF)
             {
               return result;

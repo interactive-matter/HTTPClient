@@ -230,8 +230,12 @@ HTTPClient::clientRead(FILE* stream)
       //do nothing
     };
   int result = client->read();
+  if (result == EOF)
+    {
+      return EOF;
+    }
   //as long as we do not read encoded or it is no % everything is ok
-  if (udata->encode==0 || result != '%') {
+  else if (udata->encode==0 || result != '%') {
       return result;
   } else {
           char return_value = 0;
@@ -242,7 +246,7 @@ HTTPClient::clientRead(FILE* stream)
                 {
                   return EOF;
                 }
-              if (result >= 'A' && result <= 'Z')
+              else if (result >= 'A' && result <= 'Z')
                 {
                   return_value += (1 - i) * 16 * (result - 'A');
                 }

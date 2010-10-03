@@ -126,9 +126,9 @@ HTTPClient::openClientFile()
     }
   http_stream_udata* udata = (http_stream_udata*) malloc(
       sizeof(http_stream_udata));
+  fdev_set_udata(result,udata);
   udata->client = this;
   udata->encode = 0;
-  fdev_set_udata(result,udata);
   connect();
   return result;
 }
@@ -142,7 +142,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter paramet
   if (parameters!=NULL) {
       fprintf_P(stream, PSTR("?"));
       char parameter_number = 0;
-      uri_parameter* parameter = parameters;
+      uri_parameter* parameter = &parameters[0];
       while (parameter->name!=NULL) {
           if (parameter_number>0) {
               fprintf_P(stream, PSTR("&"));
@@ -157,7 +157,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter paramet
           }
           HTTPClient::setEncoding(stream, 1, 0);
           parameter_number++;
-          parameter = parameters+(parameter_number*sizeof(uri_parameter));
+          parameter = &parameters[parameter_number];
       }
   }
   HTTPClient::setEncoding(stream, 0, 0);

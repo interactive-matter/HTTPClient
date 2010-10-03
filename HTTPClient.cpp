@@ -161,7 +161,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter paramet
       }
   }
   HTTPClient::setEncoding(stream, 0, 0);
-  fprintf_P(stream, PSTR("HTTP/1.1\nHost: %s\nAccept: */*\n"), hostName);
+  fprintf_P(stream, PSTR(" HTTP/1.1\nHost: %s\nAccept: */*\n"), hostName);
   //is there an additional header?
   if (headers != NULL)
     {

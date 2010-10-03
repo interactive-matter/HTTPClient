@@ -117,6 +117,7 @@ HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data)
 FILE*
 HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data, char* headers)
 {
+  Serial.println("PUT!!");
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("PUT "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);

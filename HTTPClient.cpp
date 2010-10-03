@@ -95,6 +95,7 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data)
 FILE*
 HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* headers)
 {
+  Serial.println("post");
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("POST "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);

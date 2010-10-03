@@ -98,8 +98,6 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* hea
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("POST "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
-  //ok header finished
-  fprintf_P(result, PSTR("\n"));
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
@@ -122,8 +120,6 @@ HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data, char* head
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("PUT "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
-  //ok header finished
-  fprintf_P(result, PSTR("\n"));
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
@@ -213,8 +209,9 @@ sendContentPayload(FILE* stream, char* data)
   //now sending data
   if (content_length > 0)
     {
-      fprintf_P(stream, PSTR("%s"), data);
+      fprintf_P(stream, PSTR("%s\n"), data);
     }
+  fprintf_P(stream, PSTR("\n"));
   return 0;
 }
 

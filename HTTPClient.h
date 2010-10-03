@@ -32,19 +32,20 @@ class HTTPClient: private Client {
 private:
   char* hostName;
   uint8_t hostIp;
-
+  //opening the client stream
   FILE* openClientFile();
+  //the rw routines
   static int clientWrite(char byte, FILE* stream);
   static int clientRead(FILE* stream);
-  FILE* uriEncodeStream(FILE* stream);
-  static int uriEncodedWrite(char byte, FILE* stream);
-  static int uriEncodedRead(FILE* stream);
-  int uriEncodedStringLength(char* string);
+
 public:
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
   FILE* getURI(char* uri);
   FILE* getURI(char* uri, char* headers);
   FILE* postURI(char* uri,char* data);
+  FILE* postURI(char* uri,char* data, char* headers);
+  FILE* putURI(char* uri,char* data);
+  FILE* putURI(char* uri,char* data, char* headers);
   static void closeStream(FILE* stream);
 };
 

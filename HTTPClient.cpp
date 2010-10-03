@@ -95,7 +95,6 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data)
 FILE*
 HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* headers)
 {
-  Serial.println("post");
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("POST "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
@@ -107,18 +106,17 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* hea
 FILE*
 HTTPClient::putURI(char* uri, char* data)
 {
-  return postURI(uri, NULL, data, NULL);
+  return putURI(uri, NULL, data, NULL);
 }
 FILE*
 HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data)
 {
-  return postURI(uri, parameters, data, NULL);
+  return putURI(uri, parameters, data, NULL);
 }
 
 FILE*
 HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data, char* headers)
 {
-  Serial.println("PUT!!");
   FILE* result = openClientFile();
   fprintf_P(result, PSTR("PUT "));
   sendUriAndHeaders(result, this->hostName, uri, parameters, headers);

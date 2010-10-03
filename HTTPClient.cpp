@@ -197,11 +197,6 @@ sendContentPayload(FILE* stream, char* data)
 {
   //calculate the content length
   int content_length = 0;
-  Serial.print("Payload: ");
-  Serial.print(data);
-  Serial.print(" (");
-  Serial.print(strlen(data));
-  Serial.println(")");
   if (data != NULL)
     {
       content_length = strlen(data);

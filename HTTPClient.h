@@ -28,6 +28,13 @@
 #include <inttypes.h>
 #include "Client.h"
 
+//a struct to store parameters
+typedef struct {
+  char* name;
+  char* value;
+} uri_parameter;
+//by default we assume that a parameter struct with NULL as parameter ends the struct
+
 class HTTPClient: private Client {
 private:
   char* hostName;
@@ -41,11 +48,16 @@ private:
 public:
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
   FILE* getURI(char* uri);
-  FILE* getURI(char* uri, char* headers);
-  FILE* postURI(char* uri,char* data);
-  FILE* postURI(char* uri,char* data, char* headers);
-  FILE* putURI(char* uri,char* data);
-  FILE* putURI(char* uri,char* data, char* headers);
+  FILE* getURI(char* uri, uri_parameter parameters[]);
+  FILE* getURI(char* uri, uri_parameter parameters[], char* headers);
+  FILE* postURI(char* uri, char* data);
+  FILE* postURI(char* uri, uri_parameter parameters[], char* data);
+  FILE* postURI(char* uri, uri_parameter parameters[], char* data, char* headers);
+  FILE* putURI(char* uri, char* data);
+  FILE* putURI(char* uri, uri_parameter parameters[],char* data);
+  FILE* putURI(char* uri, uri_parameter parameters[],char* data, char* headers);
+
+  static void setEncoding(FILE* stream, char encode, char encodeReserved);
   static void closeStream(FILE* stream);
 };
 

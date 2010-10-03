@@ -169,6 +169,7 @@ int HTTPClient::uriEncodedWrite(char byte, FILE* stream) {
           }
       }
   }
+  return 0;
 }
 
 int HTTPClient::uriEncodedRead(FILE* stream) {

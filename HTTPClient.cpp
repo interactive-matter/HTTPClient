@@ -331,6 +331,9 @@ char
 skipHeader(FILE* stream)
 {
   //skip over the header
+	int return_code=0;
+	fscanf_P(stream,PSTR("HTTP/1.1 %i"),&return_code);
+			 Serial.println(return_code);
   static int inByte = 0;
   static int lastByte = 0;
   while (!(inByte == '\n' && lastByte == '\n'))

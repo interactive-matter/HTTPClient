@@ -187,7 +187,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter paramet
   //is there an additional header?
   if (headers != NULL)
     {
-      fprintf(stream, PSTR("%s"), headers);
+      fprintf_P(stream, PSTR("%s"), headers);
     }
   return 0;
 }

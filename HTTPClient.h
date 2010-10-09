@@ -46,7 +46,9 @@ private:
   static int clientRead(FILE* stream);
 
 public:
+  HTTPClient(char* host, uint8_t* ip);
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
+
   FILE* getURI(char* uri);
   FILE* getURI(char* uri, uri_parameter parameters[]);
   FILE* getURI(char* uri, uri_parameter parameters[], char* headers);

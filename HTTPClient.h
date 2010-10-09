@@ -46,6 +46,7 @@ private:
   //the rw routines
   static int clientWrite(char byte, FILE* stream);
   static int clientRead(FILE* stream);
+  int skipHeader(FILE* stream);
 
 public:
   HTTPClient(char* host, uint8_t* ip);

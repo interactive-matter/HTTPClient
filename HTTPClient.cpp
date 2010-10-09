@@ -34,8 +34,6 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
     uri_parameter parameters[], char* headers);
 char
 sendContentPayload(FILE* stream, char* data);
-int
-skipHeader(FILE* stream);
 
 //a struct to store the uriEncoder & the handle to the http client
 typedef struct
@@ -368,10 +366,10 @@ HTTPClient::clientRead(FILE* stream)
 }
 
 int
-skipHeader(FILE* stream)
+HTTPClient::skipHeader(FILE* stream)
 {
   //skip over the header
-  fscanf_P(stream, PSTR("HTTP/1.1 %i"), &return_code);
+  fscanf_P(stream, PSTR("HTTP/1.1 %i"), &lastReturnCode);
   Serial.println(lastReturnCode);
   static int inByte = 0;
   static int lastByte = 0;

@@ -51,6 +51,17 @@ HTML pages.
 FILE* streams are a bit more unusual the normal Arduino streams. They have been 
 choosen since you can use all the nice fprintff and fscanf routines of avr-libc.
 
+The result code of a HTTP request can be read with getLastReturnCode(). It returns a 
+integer containing the return code.  200 indicates that everything was ok.
+For further details refer to http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+The HTTPClient has also a debug mode which can be witched on and off by using debug()
+with parameter 0 as no debug and anything else Ð e.g. -1 Ð as enabling debug output.
+By default the debug code is disabled. If debug is enabled the complete request and 
+response is printed out on the serial connection. 
+Very useful if your request do not work.
+
+
 All request take a number of parameters (depending on the request type):
 
 - the URI - a string (char*) containing the uri - which is normally everything 

@@ -31,7 +31,7 @@
 //some HTTP helpers
 char
 sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
-    uri_parameter parameters[], char* headers);
+    http_client_parameter parameters[], http_client_parameter headers[]);
 char
 sendContentPayload(FILE* stream, char* data);
 
@@ -67,13 +67,13 @@ HTTPClient::getURI(char* uri)
 }
 
 FILE*
-HTTPClient::getURI(char* uri, uri_parameter parameters[])
+HTTPClient::getURI(char* uri, http_client_parameter parameters[])
 {
   return getURI(uri, parameters, NULL);
 }
 
 FILE*
-HTTPClient::getURI(char* uri, uri_parameter parameters[], char* headers)
+HTTPClient::getURI(char* uri, http_client_parameter parameters[], http_client_parameter headers[])
 {
   FILE* result = openClientFile();
   if (result == NULL)
@@ -96,14 +96,14 @@ HTTPClient::postURI(char* uri, char* data)
   return postURI(uri, NULL, data, NULL);
 }
 FILE*
-HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data)
+HTTPClient::postURI(char* uri, http_client_parameter parameters[], char* data)
 {
   return postURI(uri, parameters, data, NULL);
 }
 
 FILE*
-HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data,
-    char* headers)
+HTTPClient::postURI(char* uri, http_client_parameter parameters[], char* data,
+    http_client_parameter headers[])
 {
   FILE* result = openClientFile();
   if (result == NULL)
@@ -123,14 +123,14 @@ HTTPClient::putURI(char* uri, char* data)
   return putURI(uri, NULL, data, NULL);
 }
 FILE*
-HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data)
+HTTPClient::putURI(char* uri, http_client_parameter parameters[], char* data)
 {
   return putURI(uri, parameters, data, NULL);
 }
 
 FILE*
-HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data,
-    char* headers)
+HTTPClient::putURI(char* uri, http_client_parameter parameters[], char* data,
+    http_client_parameter headers[])
 {
   FILE* result = openClientFile();
   if (result == NULL)
@@ -207,7 +207,7 @@ HTTPClient::openClientFile()
 
 char
 sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
-    uri_parameter parameters[], char* headers)
+    http_client_parameter parameters[], http_client_parameter headers[])
 {
   fprintf_P(stream, requestType, uri);
   fprintf_P(stream, PSTR(" "), uri);
@@ -218,7 +218,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
     {
       fprintf_P(stream, PSTR("?"));
       char parameter_number = 0;
-      uri_parameter* parameter = &parameters[0];
+      http_client_parameter* parameter = &parameters[0];
       while (parameter->name != NULL)
         {
           if (parameter_number > 0)
@@ -245,13 +245,18 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
   //is there an additional header?
   if (headers != NULL)
     {
-      fprintf_P(stream, PSTR("%s"), headers);
+      char headerNumber=0;
+      while (headers[headerNumber].name!=NULL) {
+          if (headers[headerNumber].value!=NULL) {
+              fprintf_P(stream,PSTR("%s: %s\n"), headers[headerNumber].name,headers[headerNumber].value);
+          }
+      }
     }
   return 0;
 }
 
 char
-sendContentPayload(FILE* stream, char* data)
+sendContentPayload(FILE* stream, char* data, char encode)
 {
   //calculate the content length
   int content_length = 0;

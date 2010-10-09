@@ -19,7 +19,7 @@
  *  along with HTTPClient.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Created on: 18.09.2010
- *      Author: marcus
+ *      Author: Marcus Nowotny of Interactive Matter
  */
 
 #ifndef HTTPCLIENT_H_
@@ -29,10 +29,13 @@
 #include "Client.h"
 
 //a struct to store parameters
+/* This struct is used to pass parameters as URI paramters and additional HTTP headers.
+ * normally you pass this as a array. The last entry must have the NULL-Pointer as name.
+ */
 typedef struct {
   char* name;
   char* value;
-} uri_parameter;
+} http_client_parameter;
 //by default we assume that a parameter struct with NULL as parameter ends the struct
 
 class HTTPClient: private Client {
@@ -41,14 +44,14 @@ public:
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
 
   FILE* getURI(char* uri);
-  FILE* getURI(char* uri, uri_parameter parameters[]);
-  FILE* getURI(char* uri, uri_parameter parameters[], char* headers);
+  FILE* getURI(char* uri, http_client_parameter parameters[]);
+  FILE* getURI(char* uri, http_client_parameter parameters[], http_client_parameter headers[]);
   FILE* postURI(char* uri, char* data);
-  FILE* postURI(char* uri, uri_parameter parameters[], char* data);
-  FILE* postURI(char* uri, uri_parameter parameters[], char* data, char* headers);
+  FILE* postURI(char* uri, http_client_parameter parameters[], char* data);
+  FILE* postURI(char* uri, http_client_parameter parameters[], char* data, http_client_parameter headers[]);
   FILE* putURI(char* uri, char* data);
-  FILE* putURI(char* uri, uri_parameter parameters[],char* data);
-  FILE* putURI(char* uri, uri_parameter parameters[],char* data, char* headers);
+  FILE* putURI(char* uri, http_client_parameter parameters[],char* data);
+  FILE* putURI(char* uri, http_client_parameter parameters[],char* data, http_client_parameter headers[]);
 
   int getLastReturnCode(void);
   void debug(char debugOn);

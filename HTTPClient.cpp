@@ -34,7 +34,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
     uri_parameter parameters[], char* headers);
 char
 sendContentPayload(FILE* stream, char* data);
-char
+int
 skipHeader(FILE* stream);
 
 //a struct to store the uriEncoder & the handle to the http client
@@ -141,6 +141,11 @@ HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data,
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
+}
+
+int HTTPClient::getLastReturnCode(void)
+{
+  return lastReturnCode;
 }
 
 void
@@ -362,13 +367,12 @@ HTTPClient::clientRead(FILE* stream)
     }
 }
 
-char
+int
 skipHeader(FILE* stream)
 {
   //skip over the header
-  int return_code = 0;
   fscanf_P(stream, PSTR("HTTP/1.1 %i"), &return_code);
-  Serial.println(return_code);
+  Serial.println(lastReturnCode);
   static int inByte = 0;
   static int lastByte = 0;
   while (!(inByte == '\n' && lastByte == '\n'))

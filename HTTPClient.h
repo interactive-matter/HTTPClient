@@ -39,6 +39,8 @@ class HTTPClient: private Client {
 private:
   char* hostName;
   uint8_t hostIp;
+  int lastReturnCode;
+
   //opening the client stream
   FILE* openClientFile();
   //the rw routines
@@ -58,6 +60,8 @@ public:
   FILE* putURI(char* uri, char* data);
   FILE* putURI(char* uri, uri_parameter parameters[],char* data);
   FILE* putURI(char* uri, uri_parameter parameters[],char* data, char* headers);
+
+  int getLastReturnCode(void);
 
   static void setEncoding(FILE* stream, char encode, char encodeReserved);
   static void closeStream(FILE* stream);

@@ -36,18 +36,6 @@ typedef struct {
 //by default we assume that a parameter struct with NULL as parameter ends the struct
 
 class HTTPClient: private Client {
-private:
-  char* hostName;
-  uint8_t hostIp;
-  int lastReturnCode;
-
-  //opening the client stream
-  FILE* openClientFile();
-  //the rw routines
-  static int clientWrite(char byte, FILE* stream);
-  static int clientRead(FILE* stream);
-  int skipHeader(FILE* stream);
-
 public:
   HTTPClient(char* host, uint8_t* ip);
   HTTPClient(char* host, uint8_t* ip, uint16_t port);
@@ -63,9 +51,24 @@ public:
   FILE* putURI(char* uri, uri_parameter parameters[],char* data, char* headers);
 
   int getLastReturnCode(void);
+  void debug(char debugOn);
 
   static void setEncoding(FILE* stream, char encode, char encodeReserved);
   static void closeStream(FILE* stream);
+
+private:
+  char* hostName;
+  uint8_t hostIp;
+  int lastReturnCode;
+  char debugCommunication;
+
+  //opening the client stream
+  FILE* openClientFile();
+  //the rw routines
+  static int clientWrite(char byte, FILE* stream);
+  static int clientRead(FILE* stream);
+  int skipHeader(FILE* stream);
+
 };
 
 

@@ -81,7 +81,8 @@ HTTPClient::getURI(char* uri, uri_parameter parameters[], char* headers)
       return NULL;
     }
   //the request and the default headers
-  sendUriAndHeaders(result, this->hostName, PSTR("GET"), uri, parameters, headers);
+  sendUriAndHeaders(result, this->hostName, PSTR("GET"), uri, parameters,
+      headers);
   //ok header finished
   fprintf_P(result, PSTR("\n"));
   skipHeader(result);
@@ -109,7 +110,8 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data,
     {
       return NULL;
     }
-  sendUriAndHeaders(result, this->hostName, PSTR("POST"), uri, parameters, headers);
+  sendUriAndHeaders(result, this->hostName, PSTR("POST"), uri, parameters,
+      headers);
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
@@ -135,15 +137,23 @@ HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data,
     {
       return NULL;
     }
-  sendUriAndHeaders(result, this->hostName, PSTR("PUT"), uri, parameters, headers);
+  sendUriAndHeaders(result, this->hostName, PSTR("PUT"), uri, parameters,
+      headers);
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
 }
 
-int HTTPClient::getLastReturnCode(void)
+int
+HTTPClient::getLastReturnCode(void)
 {
   return lastReturnCode;
+}
+
+void
+HTTPClient::debug(char debugOn)
+{
+  this->debugCommunication = debugOn;
 }
 
 void
@@ -230,7 +240,8 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
         }
     }
   HTTPClient::setEncoding(stream, 0, 0);
-  fprintf_P(stream, PSTR(" HTTP/1.1\nHost: %s\nAccept: */*\nConnection: close\n"), hostName);
+  fprintf_P(stream, PSTR(
+      " HTTP/1.1\nHost: %s\nAccept: */*\nConnection: close\n"), hostName);
   //is there an additional header?
   if (headers != NULL)
     {
@@ -277,7 +288,10 @@ HTTPClient::clientWrite(char byte, FILE* stream)
   if (udata->encode == 0)
     {
       client->write(byte);
-		Serial.print(byte);
+      if (client->debugCommunication)
+        {
+          Serial.print(byte);
+        }
     }
   else
     {
@@ -285,7 +299,10 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           & URI_ENCODE_RESERVED) == 0)))
         {
           client->write(byte);
-			Serial.print(byte);
+          if (client->debugCommunication)
+            {
+              Serial.print(byte);
+            }
         }
       else
         {
@@ -295,7 +312,10 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           for (char i = 0; i < 4; i++)
             {
               client->write(encoded[i]);
-				Serial.print(encoded[i]);
+              if (client->debugCommunication)
+                {
+                  Serial.print(encoded[i]);
+                }
             }
         }
     }
@@ -328,7 +348,10 @@ HTTPClient::clientRead(FILE* stream)
     {
       return EOF;
     }
-	Serial.print((byte)result);
+  if (client->debugCommunication)
+    {
+      Serial.print((byte) result);
+    }
   //as long as we do not read encoded or it is no % everything is ok
   if (udata->encode == 0 || result != '%')
     {

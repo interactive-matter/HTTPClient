@@ -253,6 +253,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
             {
               fprintf_P(stream, PSTR("%s: %s\n"), headers[headerNumber].name,
                   headers[headerNumber].value);
+				headerNumber++;
             }
         }
     }

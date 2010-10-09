@@ -73,7 +73,8 @@ HTTPClient::getURI(char* uri, http_client_parameter parameters[])
 }
 
 FILE*
-HTTPClient::getURI(char* uri, http_client_parameter parameters[], http_client_parameter headers[])
+HTTPClient::getURI(char* uri, http_client_parameter parameters[],
+    http_client_parameter headers[])
 {
   FILE* result = openClientFile();
   if (result == NULL)
@@ -245,18 +246,21 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
   //is there an additional header?
   if (headers != NULL)
     {
-      char headerNumber=0;
-      while (headers[headerNumber].name!=NULL) {
-          if (headers[headerNumber].value!=NULL) {
-              fprintf_P(stream,PSTR("%s: %s\n"), headers[headerNumber].name,headers[headerNumber].value);
-          }
-      }
+      char headerNumber = 0;
+      while (headers[headerNumber].name != NULL)
+        {
+          if (headers[headerNumber].value != NULL)
+            {
+              fprintf_P(stream, PSTR("%s: %s\n"), headers[headerNumber].name,
+                  headers[headerNumber].value);
+            }
+        }
     }
   return 0;
 }
 
 char
-sendContentPayload(FILE* stream, char* data, char encode)
+sendContentPayload(FILE* stream, char* data)
 {
   //calculate the content length
   int content_length = 0;

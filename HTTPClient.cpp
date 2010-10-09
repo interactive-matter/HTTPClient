@@ -30,7 +30,8 @@
 
 //some HTTP helpers
 char
-sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter parameters[], char* headers);
+sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
+    uri_parameter parameters[], char* headers);
 char
 sendContentPayload(FILE* stream, char* data);
 char
@@ -50,7 +51,7 @@ typedef struct
 #define URI_RESERVED(byte) (byte == '!' || byte == '*' || byte == '\'' || byte == '(' || byte == ')' || byte == ';' || byte == ':' || byte == '&' || byte == '=' || byte == '+' || byte == '$' || byte == ',' || byte == '/' || byte == '?' || byte == '#' || byte == '[' || byte == ']')
 
 HTTPClient::HTTPClient(char* host, uint8_t* ip) :
-    Client(ip,80), hostName(host)
+  Client(ip, 80), hostName(host)
 {
   //nothing else to do
 }
@@ -77,12 +78,12 @@ FILE*
 HTTPClient::getURI(char* uri, uri_parameter parameters[], char* headers)
 {
   FILE* result = openClientFile();
-	if (result==NULL) {
-		return NULL;
-	}
-	//the request and the default headers
-  fprintf_P(result, PSTR("GET "));
-  sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
+  if (result == NULL)
+    {
+      return NULL;
+    }
+  //the request and the default headers
+  sendUriAndHeaders(result, this->hostName, PSTR("GET"), uri, parameters, headers);
   //ok header finished
   fprintf_P(result, PSTR("\n"));
   skipHeader(result);
@@ -102,14 +103,15 @@ HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data)
 }
 
 FILE*
-HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data, char* headers)
+HTTPClient::postURI(char* uri, uri_parameter parameters[], char* data,
+    char* headers)
 {
   FILE* result = openClientFile();
-	if (result==NULL) {
-		return NULL;
-	}
-	fprintf_P(result, PSTR("POST "));
-  sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
+  if (result == NULL)
+    {
+      return NULL;
+    }
+  sendUriAndHeaders(result, this->hostName, PSTR("POST"), uri, parameters, headers);
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
@@ -127,35 +129,44 @@ HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data)
 }
 
 FILE*
-HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data, char* headers)
+HTTPClient::putURI(char* uri, uri_parameter parameters[], char* data,
+    char* headers)
 {
   FILE* result = openClientFile();
-	if (result==NULL) {
-		return NULL;
-	}
-  fprintf_P(result, PSTR("PUT "));
-  sendUriAndHeaders(result, this->hostName, uri, parameters, headers);
+  if (result == NULL)
+    {
+      return NULL;
+    }
+  sendUriAndHeaders(result, this->hostName, PSTR("PUT"), uri, parameters, headers);
   sendContentPayload(result, data);
   skipHeader(result);
   return result;
 }
 
-void HTTPClient::setEncoding(FILE* stream, char encode, char encodeReserved) {
+void
+HTTPClient::setEncoding(FILE* stream, char encode, char encodeReserved)
+{
   http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
-  if (encode==0) {
-      udata->encode=0;
-  } else {
-      if (encodeReserved) {
+  if (encode == 0)
+    {
+      udata->encode = 0;
+    }
+  else
+    {
+      if (encodeReserved)
+        {
           udata->encode = URI_ENCODE | URI_ENCODE_RESERVED;
-      } else {
+        }
+      else
+        {
           udata->encode = URI_ENCODE;
-      }
-  }
+        }
+    }
 }
 
 FILE*
 HTTPClient::openClientFile()
-{	
+{
   FILE* result = fdevopen(clientWrite, clientRead);
   if (result == NULL)
     {
@@ -166,44 +177,55 @@ HTTPClient::openClientFile()
   fdev_set_udata(result,udata);
   udata->client = this;
   udata->encode = 0;
-	if (connected()) {
-		stop();
-	}
-  if (connect()) {
-  return result;
-	} else {
-		closeStream(result);
-		return NULL;
-	}
+  if (connected())
+    {
+      stop();
+    }
+  if (connect())
+    {
+      return result;
+    }
+  else
+    {
+      closeStream(result);
+      return NULL;
+    }
 }
 
 char
-sendUriAndHeaders(FILE* stream, char* hostName, char* uri, uri_parameter parameters[], char* headers)
+sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
+    uri_parameter parameters[], char* headers)
 {
+  fprintf_P(stream, requestType, uri);
+  fprintf_P(stream, PSTR(" "), uri);
   //encode but use reserved characters
   HTTPClient::setEncoding(stream, 1, 0);
   fprintf_P(stream, PSTR("%s"), uri);
-  if (parameters!=NULL) {
+  if (parameters != NULL)
+    {
       fprintf_P(stream, PSTR("?"));
       char parameter_number = 0;
       uri_parameter* parameter = &parameters[0];
-      while (parameter->name!=NULL) {
-          if (parameter_number>0) {
+      while (parameter->name != NULL)
+        {
+          if (parameter_number > 0)
+            {
               fprintf_P(stream, PSTR("&"));
-          }
+            }
           HTTPClient::setEncoding(stream, 1, 1);
           fprintf_P(stream, PSTR("%s"), parameter->name);
           HTTPClient::setEncoding(stream, 1, 0);
           fprintf_P(stream, PSTR("="));
           HTTPClient::setEncoding(stream, 1, 1);
-          if (parameter->value!=NULL) {
+          if (parameter->value != NULL)
+            {
               fprintf_P(stream, PSTR("%s"), parameter->value);
-          }
+            }
           HTTPClient::setEncoding(stream, 1, 0);
           parameter_number++;
           parameter = &parameters[parameter_number];
-      }
-  }
+        }
+    }
   HTTPClient::setEncoding(stream, 0, 0);
   fprintf_P(stream, PSTR(" HTTP/1.1\nHost: %s\nAccept: */*\n"), hostName);
   //is there an additional header?
@@ -238,19 +260,25 @@ sendContentPayload(FILE* stream, char* data)
 int
 HTTPClient::clientWrite(char byte, FILE* stream)
 {
-	if (stream==NULL) {
-		return EOF;
-	}
+  if (stream == NULL)
+    {
+      return EOF;
+    }
   http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
   HTTPClient* client = udata->client;
-	if (client->connected()==0) {
-		closeStream(stream);
-		return EOF;
-	}
-  if (udata->encode==0) {
+  if (client->connected() == 0)
+    {
+      closeStream(stream);
+      return EOF;
+    }
+  if (udata->encode == 0)
+    {
       client->write(byte);
-  } else {
-      if (URI_ALLOWED(byte) || ((URI_RESERVED(byte) && (udata->encode & URI_ENCODE_RESERVED)==0)))
+    }
+  else
+    {
+      if (URI_ALLOWED(byte) || ((URI_RESERVED(byte) && (udata->encode
+          & URI_ENCODE_RESERVED) == 0)))
         {
           client->write(byte);
         }
@@ -264,27 +292,30 @@ HTTPClient::clientWrite(char byte, FILE* stream)
               client->write(encoded[i]);
             }
         }
-  }
+    }
   return 0;
 }
 
 int
 HTTPClient::clientRead(FILE* stream)
 {
-	if (stream==NULL) {
-		return EOF;
-	}
-	http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
+  if (stream == NULL)
+    {
+      return EOF;
+    }
+  http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
   HTTPClient* client = udata->client;
-	if(!client->connected()) {
-		return EOF;
-	}
+  if (!client->connected())
+    {
+      return EOF;
+    }
   //block until we got a byte
   while (client->available() == 0)
     {
-      if (client->connected()==0) {
+      if (client->connected() == 0)
+        {
           return EOF;
-      }
+        }
     };
   int result = client->read();
   if (result == EOF)
@@ -292,48 +323,52 @@ HTTPClient::clientRead(FILE* stream)
       return EOF;
     }
   //as long as we do not read encoded or it is no % everything is ok
-  else if (udata->encode==0 || result != '%') {
+  else if (udata->encode == 0 || result != '%')
+    {
       return result;
-  } else {
+    }
+  else
+    {
       //block until we got the needed bytes
       while (client->available() >= 2)
         {
-          if (client->connected()==0) {
-              return EOF;
-          }
-        };
-          char return_value = 0;
-          for (char i = 0; i < 2; i++)
+          if (client->connected() == 0)
             {
-              result = client->read();
-              if (result == EOF)
-                {
-                  return EOF;
-                }
-              else if (result >= 'A' && result <= 'Z')
-                {
-                  return_value += (1 - i) * 16 * (result - 'A');
-                }
-              else if (result >= 'a' && result <= 'z')
-                {
-                  return_value += (1 - i) * 16 * (result - 'a');
-                }
-              else if (result >= '0' && result <= '9')
-                {
-                  return_value += (1 - i) * 16 * (result - '0');
-                }
+              return EOF;
             }
-          return return_value;
+        };
+      char return_value = 0;
+      for (char i = 0; i < 2; i++)
+        {
+          result = client->read();
+          if (result == EOF)
+            {
+              return EOF;
+            }
+          else if (result >= 'A' && result <= 'Z')
+            {
+              return_value += (1 - i) * 16 * (result - 'A');
+            }
+          else if (result >= 'a' && result <= 'z')
+            {
+              return_value += (1 - i) * 16 * (result - 'a');
+            }
+          else if (result >= '0' && result <= '9')
+            {
+              return_value += (1 - i) * 16 * (result - '0');
+            }
         }
+      return return_value;
+    }
 }
 
 char
 skipHeader(FILE* stream)
 {
   //skip over the header
-	int return_code=0;
-	fscanf_P(stream,PSTR("HTTP/1.1 %i"),&return_code);
-			 Serial.println(return_code);
+  int return_code = 0;
+  fscanf_P(stream, PSTR("HTTP/1.1 %i"), &return_code);
+  Serial.println(return_code);
   static int inByte = 0;
   static int lastByte = 0;
   while (!(inByte == '\n' && lastByte == '\n'))
@@ -350,7 +385,7 @@ skipHeader(FILE* stream)
           HTTPClient::closeStream(stream);
           return NULL;
         }
-		Serial.print((char) inByte);
+      Serial.print((char) inByte);
     }
   return 0;
 }
@@ -358,12 +393,14 @@ skipHeader(FILE* stream)
 void
 HTTPClient::closeStream(FILE* stream)
 {
-	if (stream!=NULL) {
-  http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
-	if (udata->client->connected()) {
-  udata->client->stop();
-	}
-  free(udata);
-  fclose(stream);
-	}
+  if (stream != NULL)
+    {
+      http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
+      if (udata->client->connected())
+        {
+          udata->client->stop();
+        }
+      free(udata);
+      fclose(stream);
+    }
 }

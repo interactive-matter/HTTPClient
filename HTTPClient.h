@@ -188,8 +188,6 @@ private:
       http_client_parameter parameters[], http_client_parameter headers[]);
   char
   sendContentPayload(FILE* stream, char* data);
-
-
 };
 
 #endif /* HTTPCLIENT_H_ */

@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For HTTPClient
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+HTTPClient	KEYWORD1
+http_client_parameter KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+getURI KEYWORD2
+postURI KEYWORD2
+putURI KEYWORD2
+getLastReturnCode KEYWORD2
+debug KEYWORD2
+closeStream KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+#none

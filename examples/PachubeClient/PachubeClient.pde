@@ -40,7 +40,6 @@ byte gateway[] = {
 byte subnet[] = { 
   255, 255, 255, 0 };
 
-#define PACHUBE_API_KEY    "X-PachubeApiKey: afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841\n"
 #define SHARE_FEED_URI      "/v2/feeds/10564.csv" 
 
 
@@ -79,7 +78,14 @@ void loop() {
     sprintf(buffer, "%d,%d", sensorReading, sensorReading);
 
     HTTPClient client("api.pachube.com",server);
-    FILE* result = client.putURI(SHARE_FEED_URI,NULL,buffer,PACHUBE_API_KEY);
+    client.debug(-1);
+    http_client_parameter pachube_api_header[] = {
+      { 
+        "X-PachubeApiKey","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841"      }
+      ,{
+        NULL,NULL      }
+    };
+    FILE* result = client.putURI(SHARE_FEED_URI,NULL,buffer, pachube_api_header);
     int returnCode = client.getLastReturnCode();
     if (result!=NULL) {
       client.closeStream(result);
@@ -99,6 +105,7 @@ void loop() {
   // the loop:
   lastConnected = client.connected();
 }
+
 
 
 

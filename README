@@ -1,0 +1,79 @@
+*************************************
+*             HTTPClient            *
+*************************************
+
+  HTTPClient is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  HTTPClient is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  You should have received a copy of the GNU General Public License
+  along with HTTPClient.  If not, see <http://www.gnu.org/licenses/>.
+  
+* Creating a HTTP Client
+
+HTTP Client works with the Arduino Ethernet Library. Before you can create
+a HTTP client you must initialize your ethernet connection with something 
+like:
+
+  Ethernet.begin(mac, ip);
+
+For details on this see http://arduino.cc/en/Reference/ServerBegin
+
+To create a client (in this example for pachube) you can simply call one of 
+the constructors:
+
+    //  The address of the server you want to connect to (pachube.com):
+    byte server[] = { 173,203,98,29 }; 
+    HTTPClient client("api.pachube.com",server);
+
+which is equivalent to
+
+    HTTPClient client("api.pachube.com",server,80);
+
+Now you are ready to go.
+
+* Posting request
+
+HTTP client supports three types of requests
+- normal GET request to get some data from a URL
+- POST requests to transfer bigger amount of data to a server
+- PUT request as sepcified by REST APIs
+- currently there is no need for DELETE requests - so they do not exist yet.
+
+The result of a request is a stream (aka FILE*) by that you can read the data
+without the need to keep the whole answer in memory - which would fail for most
+HTML pages.
+FILE* streams are a bit more unusual the normal Arduino streams. They have been 
+choosen since you can use all the nice fprintff and fscanf routines of avr-libc.
+
+All request take a number of parameters (depending on the request type):
+
+- the URI - a string (char*) containing the uri - which is normally everything 
+  following the hostname of a URL for http://arduino.cc/en/Reference/HomePage
+  it would be Reference/HomePage
+- optional parameters as key value pairs. Parameters are appended to a URL like
+  http://myhost/the/uri?parameter-name=parameter-value&other=parameter
+  parameters are values of the struct http_client_parameter. It is easiest to
+  do this like
+  
+      http_client_parameter parameters[] = {
+        { "key","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841" }
+        ,{ NULL,NULL }
+      };
+      
+- for POST and PUT request a string with additional data can be passed as a string. The data
+  has to be in memory. Future Versions may have future features.
+  
+- for all requests additional headers can be specified. It works exactly the same was as uri
+  parameters:
+    http_client_parameter pachube_api_header[] = {
+      { "X-PachubeApiKey","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841" }
+      ,{ NULL,NULL }
+    };
+    
+Even though the HTTPClient supports HTTP 1.1 request no keep alive requests are supported currently.

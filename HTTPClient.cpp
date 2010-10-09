@@ -28,13 +28,6 @@
 #include <HardwareSerial.h>
 #include "HTTPClient.h"
 
-//some HTTP helpers
-char
-sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
-    http_client_parameter parameters[], http_client_parameter headers[]);
-char
-sendContentPayload(FILE* stream, char* data);
-
 //a struct to store the uriEncoder & the handle to the http client
 typedef struct
 {
@@ -207,7 +200,7 @@ HTTPClient::openClientFile()
 }
 
 char
-sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
+HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
     http_client_parameter parameters[], http_client_parameter headers[])
 {
   fprintf_P(stream, requestType, uri);
@@ -261,7 +254,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
 }
 
 char
-sendContentPayload(FILE* stream, char* data)
+HTTPClient::sendContentPayload(FILE* stream, char* data)
 {
   //calculate the content length
   int content_length = 0;

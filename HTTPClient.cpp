@@ -230,7 +230,7 @@ sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
         }
     }
   HTTPClient::setEncoding(stream, 0, 0);
-  fprintf_P(stream, PSTR(" HTTP/1.1\nHost: %s\nAccept: */*\n"), hostName);
+  fprintf_P(stream, PSTR(" HTTP/1.1\nHost: %s\nAccept: */*\nConnection: close\n"), hostName);
   //is there an additional header?
   if (headers != NULL)
     {
@@ -277,6 +277,7 @@ HTTPClient::clientWrite(char byte, FILE* stream)
   if (udata->encode == 0)
     {
       client->write(byte);
+		Serial.print(byte);
     }
   else
     {
@@ -284,6 +285,7 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           & URI_ENCODE_RESERVED) == 0)))
         {
           client->write(byte);
+			Serial.print(byte);
         }
       else
         {
@@ -293,6 +295,7 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           for (char i = 0; i < 4; i++)
             {
               client->write(encoded[i]);
+				Serial.print(encoded[i]);
             }
         }
     }
@@ -325,8 +328,9 @@ HTTPClient::clientRead(FILE* stream)
     {
       return EOF;
     }
+	Serial.print((byte)result);
   //as long as we do not read encoded or it is no % everything is ok
-  else if (udata->encode == 0 || result != '%')
+  if (udata->encode == 0 || result != '%')
     {
       return result;
     }
@@ -370,7 +374,6 @@ HTTPClient::skipHeader(FILE* stream)
 {
   //skip over the header
   fscanf_P(stream, PSTR("HTTP/1.1 %i"), &lastReturnCode);
-  Serial.println(lastReturnCode);
   static int inByte = 0;
   static int lastByte = 0;
   while (!(inByte == '\n' && lastByte == '\n'))
@@ -387,7 +390,6 @@ HTTPClient::skipHeader(FILE* stream)
           HTTPClient::closeStream(stream);
           return NULL;
         }
-      Serial.print((char) inByte);
     }
   return 0;
 }

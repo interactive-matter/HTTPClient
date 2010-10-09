@@ -78,7 +78,7 @@ void loop() {
     sprintf(buffer, "%d,%d", sensorReading, sensorReading);
 
     HTTPClient client("api.pachube.com",server);
-    client.debug(-1);
+    //client.debug(-1);
     http_client_parameter pachube_api_header[] = {
       { 
         "X-PachubeApiKey","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841"      }

@@ -199,6 +199,8 @@ private:
       http_client_parameter parameters[], http_client_parameter headers[]);
   char
   sendContentPayload(FILE* stream, char* data);
+  //a helper to empty the buffer
+  void empty(void);
 };
 
 #endif /* HTTPCLIENT_H_ */

@@ -44,12 +44,14 @@ typedef struct
 HTTPClient::HTTPClient(char* host) :
   Client(host, 80), hostName(host), debugCommunication(0)
 {
+  this->empty();
   //nothing else to do
 }
 
 HTTPClient::HTTPClient(char*host, uint16_t port) :
   Client(host, port), hostName(host), debugCommunication(0)
 {
+  this->empty();
   //nothing else to do
 }
 
@@ -448,4 +450,10 @@ HTTPClient::closeStream(FILE* stream)
       free(udata);
       fclose(stream);
     }
+}
+
+void HTTPClient::empty(void) {
+  while (Client::available()) {
+      char dummy = Client::read();
+  }
 }

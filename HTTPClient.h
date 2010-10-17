@@ -26,7 +26,7 @@
 #define HTTPCLIENT_H_
 
 #include <inttypes.h>
-#include "Client.h"
+#include "WiFlyClient.h"
 
 /* This struct is used to pass parameters as URI paramters and additional HTTP headers.
  * normally you pass this as a array. The last entry must have the NULL-Pointer as name.
@@ -49,11 +49,11 @@ public:
   /*
    * create a HTTP client that connects to the default port 80.
    */
-  HTTPClient(char* host, uint8_t* ip);
+  HTTPClient(char* host);
   /*
    * create a HTTP client that connects to another port. HTTPS is not supported.
    */
-  HTTPClient(char* host, uint8_t* ip, uint16_t port);
+  HTTPClient(char* host, uint16_t port);
 
   /*
    * Post a GET request to the server.

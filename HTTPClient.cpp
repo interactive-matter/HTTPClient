@@ -260,7 +260,7 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, c
         }
     }
   //we ensure to flush the client
-  Client:flush();
+  //Client:flush();
   return 0;
 }
 
@@ -283,7 +283,7 @@ HTTPClient::sendContentPayload(FILE* stream, char* data)
     }
   fprintf_P(stream, PSTR("\n"));
   //we ensure to flush the client
-  Client:flush();
+  //Client:flush();
   return 0;
 }
 
@@ -412,7 +412,7 @@ int
 HTTPClient::skipHeader(FILE* stream)
 {
   //we ensure to flush the client
-  Client:flush();
+  //Client:flush();
   //skip over the header
   fscanf_P(stream, PSTR("HTTP/1.1 %i"), &lastReturnCode);
   static int inByte = 0;

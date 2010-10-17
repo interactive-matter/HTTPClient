@@ -262,7 +262,7 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, c
         }
     }
   //we ensure to flush the client
-  //Client:flush();
+  Client:flush();
   return 0;
 }
 
@@ -285,7 +285,7 @@ HTTPClient::sendContentPayload(FILE* stream, char* data)
     }
   fprintf_P(stream, PSTR("\n"));
   //we ensure to flush the client
-  //Client:flush();
+  Client:flush();
   return 0;
 }
 

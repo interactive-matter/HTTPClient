@@ -150,6 +150,15 @@ HTTPClient::debug(char debugOn)
   this->debugCommunication = debugOn;
 }
 
+boolean HTTPClient::connected() {
+  return Client::connected();
+}
+
+int HTTPClient::available() {
+  return Client::available();
+}
+
+
 void
 HTTPClient::setEncoding(FILE* stream, char encode, char encodeReserved)
 {
@@ -250,6 +259,8 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, c
             }
         }
     }
+  //we ensure to flush the client
+  Client:flush();
   return 0;
 }
 
@@ -271,6 +282,8 @@ HTTPClient::sendContentPayload(FILE* stream, char* data)
       fprintf_P(stream, PSTR("%s\n"), data);
     }
   fprintf_P(stream, PSTR("\n"));
+  //we ensure to flush the client
+  Client:flush();
   return 0;
 }
 

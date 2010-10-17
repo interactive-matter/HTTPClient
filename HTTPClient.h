@@ -146,6 +146,17 @@ public:
    */
   int
   getLastReturnCode(void);
+
+  /*
+   * Check if the client is still connected. By destroying the stream you get automatically disconnected
+   */
+  boolean connected();
+  /*
+   * are there bytes on the stream?
+   */
+  int available();
+
+
   /*
    * enable or disable the debug code.
    * By default the debug code is disabled. If debug is enabled the complete request and response

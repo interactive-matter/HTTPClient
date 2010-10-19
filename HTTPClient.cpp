@@ -279,6 +279,9 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType,
             }
         }
     }
+  if (authBuffer!=NULL) {
+      fprintf_P(stream,PSTR("Authorization: Basic %s\n"),authBuffer);
+  }
   //we ensure to flush the client
   Client: flush();
   return 0;

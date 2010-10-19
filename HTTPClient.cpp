@@ -42,17 +42,31 @@ typedef struct
 #define URI_RESERVED(byte) (byte == '!' || byte == '*' || byte == '\'' || byte == '(' || byte == ')' || byte == ';' || byte == ':' || byte == '&' || byte == '=' || byte == '+' || byte == '$' || byte == ',' || byte == '/' || byte == '?' || byte == '#' || byte == '[' || byte == ']')
 
 HTTPClient::HTTPClient(char* host) :
-  Client(host, 80), hostName(host), debugCommunication(0)
+  Client(host, 80), hostName(host), debugCommunication(0), authBuffer(NULL)
 {
   this->empty();
   //nothing else to do
 }
 
 HTTPClient::HTTPClient(char*host, uint16_t port) :
-  Client(host, port), hostName(host), debugCommunication(0)
+  Client(host, port), hostName(host), debugCommunication(0), authBuffer(NULL)
 {
   this->empty();
   //nothing else to do
+}
+
+HTTPClient::HTTPClient(char* host, char* name, char* password) :
+  Client(host, 80), hostName(host), debugCommunication(0)
+{
+  this->empty();
+  this->mimeEncode(name,password);
+}
+
+HTTPClient::HTTPClient(char*host, uint16_t port, char* name, char* password) :
+  Client(host, port), hostName(host), debugCommunication(0)
+{
+  this->empty();
+  this->mimeEncode(name,password);
 }
 
 FILE*
@@ -152,14 +166,17 @@ HTTPClient::debug(char debugOn)
   this->debugCommunication = debugOn;
 }
 
-boolean HTTPClient::connected() {
+boolean
+HTTPClient::connected()
+{
   return Client::connected();
 }
 
-int HTTPClient::available() {
+int
+HTTPClient::available()
+{
   return Client::available();
 }
-
 
 void
 HTTPClient::setEncoding(FILE* stream, char encode, char encodeReserved)
@@ -192,7 +209,7 @@ HTTPClient::openClientFile()
     }
   http_stream_udata* udata = (http_stream_udata*) malloc(
       sizeof(http_stream_udata));
-  fdev_set_udata(result,udata);
+  fdev_set_udata(result, udata);
   udata->client = this;
   udata->encode = 0;
   if (connected())
@@ -211,8 +228,9 @@ HTTPClient::openClientFile()
 }
 
 char
-HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
-    http_client_parameter parameters[], http_client_parameter headers[])
+HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType,
+    char* uri, http_client_parameter parameters[],
+    http_client_parameter headers[])
 {
   fprintf_P(stream, requestType, uri);
   fprintf_P(stream, PSTR(" "), uri);
@@ -257,12 +275,12 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, c
             {
               fprintf_P(stream, PSTR("%s: %s\n"), headers[headerNumber].name,
                   headers[headerNumber].value);
-				headerNumber++;
+              headerNumber++;
             }
         }
     }
   //we ensure to flush the client
-  Client:flush();
+  Client: flush();
   return 0;
 }
 
@@ -285,7 +303,7 @@ HTTPClient::sendContentPayload(FILE* stream, char* data)
     }
   fprintf_P(stream, PSTR("\n"));
   //we ensure to flush the client
-  Client:flush();
+  Client: flush();
   return 0;
 }
 
@@ -452,8 +470,48 @@ HTTPClient::closeStream(FILE* stream)
     }
 }
 
-void HTTPClient::empty(void) {
-  while (Client::available()) {
+void
+HTTPClient::empty(void)
+{
+  while (Client::available())
+    {
       char dummy = Client::read();
-  }
+    }
+}
+
+static char
+mime_code(const char c)
+{
+  if (c < 26)
+    return c + 'A';
+  if (c < 52)
+    return c - 26 + 'a';
+  if (c < 62)
+    return c - 52 + '0';
+  if (c == 62)
+    return '+';
+  return '/';
+}
+
+void
+HTTPClient::mimeEncode(char* name, char* pw)
+{
+  //allocate authentication buffer
+  authBuffer = (char*) malloc(65 * sizeof(char));
+  char* buf = (char*) malloc(strlen(name) + strlen(pw) + 1);
+  sprintf(buf, "%s:%s", name, pw);
+  int i = 0, j = 0, c[3];
+  while (j < 64 && buf[i])
+    {
+      c[0] = buf[i++];
+      c[1] = buf[i] ? buf[i++] : 0;
+      c[2] = buf[i] ? buf[i++] : 0;
+      authBuffer[j++] = mime_code(c[0] >> 2);
+      authBuffer[j++] = mime_code(((c[0] << 4) & 0x30) | (c[1] >> 4));
+      authBuffer[j++] = c[1] ? mime_code(((c[1] << 2) & 0x3c) | (c[2] >> 6))
+          : '=';
+      authBuffer[j++] = c[2] ? mime_code(c[2] & 0x3f) : '=';
+    }
+  authBuffer[j] = 0;
+  free(buf);
 }

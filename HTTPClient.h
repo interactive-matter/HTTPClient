@@ -26,6 +26,7 @@
 #define HTTPCLIENT_H_
 
 #include <inttypes.h>
+#include <stdio.h>
 #include "WiFlyClient.h"
 
 /* This struct is used to pass parameters as URI paramters and additional HTTP headers.
@@ -54,6 +55,14 @@ public:
    * create a HTTP client that connects to another port. HTTPS is not supported.
    */
   HTTPClient(char* host, uint16_t port);
+  /*
+   * create a HTTP client that connects to the default port 80.
+   */
+  HTTPClient(char* host, char* name, char* password);
+  /*
+   * create a HTTP client that connects to another port. HTTPS is not supported.
+   */
+  HTTPClient(char* host, uint16_t port, char* name, char* password);
 
   /*
    * Post a GET request to the server.
@@ -79,13 +88,13 @@ public:
   FILE*
   getURI(char* uri, http_client_parameter parameters[],
       http_client_parameter headers[]);
-  FILE*
   /*
    * Post a POST request to the server.
    * The data is directly streamed to the server. It must be kept completely in
    * memory since we must know how much data to send.
    * The result is a file handle or null is an error occured.
    */
+  FILE*
   postURI(char* uri, char* data);
   /*
    * Post a POST request to the server and give additional URI parameters like ?X=Y&...
@@ -177,6 +186,8 @@ private:
   int lastReturnCode;
   //print to serial?
   char debugCommunication;
+  //buffer for basic auth info
+  char* authBuffer;
 
   //opening the client stream
   FILE*
@@ -201,6 +212,8 @@ private:
   sendContentPayload(FILE* stream, char* data);
   //a helper to empty the buffer
   void empty(void);
+  //a helper to mime encode name & password
+  void mimeEncode(char* name, char* pw);
 };
 
 #endif /* HTTPCLIENT_H_ */

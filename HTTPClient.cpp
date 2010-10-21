@@ -437,7 +437,9 @@ HTTPClient::skipHeader(FILE* stream)
   //we ensure to flush the client
   //Client:flush();
   //skip over the header
-  fscanf_P(stream, PSTR("HTTP/1.1 %i"), &lastReturnCode);
+	//somehow the Wifly messes up the first character
+	fgetc(stream);
+  fscanf_P(stream, PSTR("TTP/1.1 %i"), &lastReturnCode);
   static int inByte = 0;
   static int lastByte = 0;
   while (!(inByte == '\n' && lastByte == '\n'))

@@ -312,7 +312,8 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           char encoded[4] =
             { 0, 0, 0 };
           sprintf(encoded, "%%%2x", byte);
-          for (char i = 0; i < 4; i++)
+          // Write only the first three bytes, not the trailing null
+          for (char i = 0; i < 3; i++)
             {
               client->write(encoded[i]);
               if (client->debugCommunication)

@@ -26,7 +26,7 @@
 #define HTTPCLIENT_H_
 
 #include <inttypes.h>
-#include "Client.h"
+#include "EthernetClient.h"
 
 /* This struct is used to pass parameters as URI paramters and additional HTTP headers.
  * normally you pass this as a array. The last entry must have the NULL-Pointer as name.
@@ -43,7 +43,7 @@ typedef struct
  * To construct a HTTP client you have to provide the IP AND the name of the server Ð else
  * the virtual host management of most internet servers will fail. Sorry for the inconvenience.
  */
-class HTTPClient : private Client
+class HTTPClient : private EthernetClient
 {
 public:
   /*
@@ -162,6 +162,10 @@ public:
 private:
   //the name of the host we are talking to
   char* hostName;
+  //the ip of the host
+  uint8_t* ip;
+    //the port we are talking to
+    uint16_t port;  
   //the HTTP return code of the last request
   int lastReturnCode;
   //print to serial?

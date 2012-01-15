@@ -42,13 +42,13 @@ typedef struct
 #define URI_RESERVED(byte) (byte == '!' || byte == '*' || byte == '\'' || byte == '(' || byte == ')' || byte == ';' || byte == ':' || byte == '&' || byte == '=' || byte == '+' || byte == '$' || byte == ',' || byte == '/' || byte == '?' || byte == '#' || byte == '[' || byte == ']')
 
 HTTPClient::HTTPClient(char* host, uint8_t* ip) :
-  Client(ip, 80), hostName(host), debugCommunication(0)
+    EthernetClient(), hostName(host), debugCommunication(0), ip(ip), port(80)
 {
   //nothing else to do
 }
 
 HTTPClient::HTTPClient(char*host, uint8_t* ip, uint16_t port) :
-  Client(ip, port), hostName(host), debugCommunication(0)
+    EthernetClient(), hostName(host), debugCommunication(0), ip(ip), port(port)
 {
   //nothing else to do
 }
@@ -188,7 +188,7 @@ HTTPClient::openClientFile()
     {
       stop();
     }
-  if (connect())
+  if (connect(ip,port))
     {
       return result;
     }

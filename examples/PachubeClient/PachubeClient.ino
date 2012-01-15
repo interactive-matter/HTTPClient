@@ -48,7 +48,7 @@ byte server[] = {
   173,203,98,29 }; 
 
 // initialize the library instance:
-Client client(server, 80);
+EthernetClient client;
 
 long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
 boolean lastConnected = false;      // state of the connection last time through the main loop
@@ -105,9 +105,3 @@ void loop() {
   // the loop:
   lastConnected = client.connected();
 }
-
-
-
-
-
-

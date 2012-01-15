@@ -19,8 +19,9 @@
  
  */
 
-#include <SPI.h>
-#include <Ethernet.h>
+#include "WiFly.h"
+#include "Credentials.h"
+
 #include <HTTPClient.h>
 #include <stdio.h>
 #include <Metro.h>
@@ -28,17 +29,6 @@ char buffer[40];
 
 Metro sendingMetro = Metro(60000L);
 
-// assign a MAC address for the ethernet controller.
-// fill in your address here:
-byte mac[] = { 
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-// assign an IP address for the controller:
-byte ip[] = { 
-  10,1,5,23 };
-byte gateway[] = {
-  10,1,5,1};	
-byte subnet[] = { 
-  255, 255, 255, 0 };
 
 #define SHARE_FEED_URI      "/v2/feeds/10564.csv" 
 
@@ -58,9 +48,13 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Pachube Client");
   // start the ethernet connection and serial port:
-  Ethernet.begin(mac, ip);
-  // give the ethernet module time to boot up:
-  delay(1000);
+  WiFly.begin();
+  
+  if (!WiFly.join(ssid, passphrase)) {
+    Serial.println("Association failed.");
+    while (1) {
+      // Hang on failure.
+    }
   Serial.println("ready");
 }
 
@@ -77,7 +71,7 @@ void loop() {
 
     sprintf(buffer, "%d,%d", sensorReading, sensorReading);
 
-    HTTPClient client("api.pachube.com",server);
+    HTTPClient client("api.pachube.com");
     //client.debug(-1);
     http_client_parameter pachube_api_header[] = {
       { 

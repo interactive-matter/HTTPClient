@@ -47,7 +47,7 @@ HTTPClient::HTTPClient(char* host, uint8_t* ip) :
   //nothing else to do
 }
 
-HTTPClient::HTTPClient(char*host, uint8_t* ip, uint16_t port) :
+HTTPClient::HTTPClient(char* host, uint8_t* ip, uint16_t port) :
     EthernetClient(), hostName(host), debugCommunication(0), ip(ip), port(port)
 {
   //nothing else to do

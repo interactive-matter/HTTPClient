@@ -49,11 +49,11 @@ public:
   /*
    * create a HTTP client that connects to the default port 80.
    */
-  HTTPClient(char* host);
+  HTTPClient(char* host, uint8_t* ip );
   /*
    * create a HTTP client that connects to another port. HTTPS is not supported.
    */
-  HTTPClient(char* host, uint16_t port);
+  HTTPClient(char* host, uint8_t* ip, uint16_t port);
 
   /*
    * Post a GET request to the server.

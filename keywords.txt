@@ -7,7 +7,7 @@
 #######################################
 
 HTTPClient	KEYWORD1
-http_client_parameter KEYWORD1
+http_client_parameter	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

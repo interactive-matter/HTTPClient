@@ -188,7 +188,7 @@ private:
   setEncoding(FILE* stream, char encode, char encodeReserved);
   //some HTTP helpers
   char
-  sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
+  sendUriAndHeaders(FILE* stream, char* hostName, const char* requestType, char* uri,
       http_client_parameter parameters[], http_client_parameter headers[]);
   char
   sendContentPayload(FILE* stream, char* data);

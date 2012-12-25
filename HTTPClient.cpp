@@ -200,7 +200,7 @@ HTTPClient::openClientFile()
 }
 
 char
-HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, char* requestType, char* uri,
+HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, const char* requestType, char* uri,
     http_client_parameter parameters[], http_client_parameter headers[])
 {
   fprintf_P(stream, requestType, uri);

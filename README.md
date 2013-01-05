@@ -13,7 +13,7 @@ HTTP Client works with the Arduino Ethernet Library. Before you can create
 a HTTP client you must initialize your ethernet connection with something 
 like:
 
-```arduino
+```c++
 Ethernet.begin(mac, ip);
 ```
 
@@ -22,7 +22,7 @@ For details on this see http://arduino.cc/en/Reference/ServerBegin
 To create a client (in this example for pachube) you can simply call one of 
 the constructors:
 
-```arduino
+```c++
 //  The address of the server you want to connect to (pachube.com):
 byte server[] = { 173,203,98,29 }; 
 HTTPClient client("api.pachube.com",server);
@@ -30,7 +30,7 @@ HTTPClient client("api.pachube.com",server);
 
 which is equivalent to
 
-```arduino
+```c++
 HTTPClient client("api.pachube.com",server,80);
 ```
 
@@ -76,7 +76,7 @@ All request take a number of parameters (depending on the request type):
   parameters are values of the struct http_client_parameter. It is easiest to
   do this like:
 
-```arduino
+```c++
 http_client_parameter parameters[] = {
   { "key","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841" }
   ,{ NULL,NULL }
@@ -89,7 +89,7 @@ http_client_parameter parameters[] = {
 * for all requests additional headers can be specified. It works exactly the same was as uri
   parameters:
 
-```arduino
+```c++
 http_client_parameter pachube_api_header[] = {
   { "X-PachubeApiKey","afad32216dd2aa83c768ce51eef041d69a90a6737b2187dada3bb301e4c48841" }
   ,{ NULL,NULL }

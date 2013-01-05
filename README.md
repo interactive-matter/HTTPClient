@@ -40,10 +40,10 @@ Now you are ready to go.
 
 HTTP client supports three types of requests:
 
-* normal GET request to get some data from a URL
+* Normal GET request to get some data from a URL
 * POST requests to transfer bigger amount of data to a server
 * PUT request as sepcified by REST APIs
-* currently there is no need for DELETE requests - so they do not exist yet.
+* Currently there is no need for DELETE requests - so they do not exist yet.
 
 The result of a request is a stream (aka FILE*) by that you can read the data
 without the need to keep the whole answer in memory - which would fail for most
@@ -53,25 +53,25 @@ FILE* streams are a bit more unusual the normal Arduino streams. They have been
 choosen since you can use all the nice fprintff and fscanf routines of avr-libc.
 After reading the response from the stream it has to be closed with the method `closeStream(stream)`
 
-DO NOT FORGET IT. Each stream has some data attached and if you forget to close the 
+**DO NOT FORGET IT**. Each stream has some data attached and if you forget to close the 
 stream you get a memory leak, slowly filling up the precious memory of the Arduino.
 
 The result code of a HTTP request can be read with getLastReturnCode(). It returns a 
 integer containing the return code.  200 indicates that everything was ok.
 For further details refer to http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
-The HTTPClient has also a debug mode which can be witched on and off by using debug()
+The HTTPClient has also a debug mode which can be switched on and off by using `debug()`
 with parameter 0 as no debug and anything else Ð e.g. -1 Ð as enabling debug output.
 By default the debug code is disabled. If debug is enabled the complete request and 
-response is printed out on the serial connection. 
-Very useful if your request do not work.
+response is printed out on the serial connection. Very useful if your request does
+not work.
 
 All request take a number of parameters (depending on the request type):
 
-* the URI - a string (char*) containing the uri - which is normally everything 
+* The URI - a string (char*) containing the uri - which is normally everything 
   following the hostname of a URL for http://arduino.cc/en/Reference/HomePage
   it would be Reference/HomePage
-* optional parameters as key value pairs. Parameters are appended to a URL like
+* Optional parameters as key value pairs. Parameters are appended to a URL like
   http://myhost/the/uri?parameter-name=parameter-value&other=parameter
   parameters are values of the struct http_client_parameter. It is easiest to
   do this like:
@@ -83,10 +83,9 @@ http_client_parameter parameters[] = {
 };
 ```
   
-* for POST and PUT request a string with additional data can be passed as a string. The data
+* For POST and PUT request a string with additional data can be passed as a string. The data
   has to be in memory. Future Versions may have future features.
-  
-* for all requests additional headers can be specified. It works exactly the same was as uri
+* For all requests additional headers can be specified. It works exactly the same was as uri
   parameters:
 
 ```c++
@@ -100,8 +99,8 @@ Even though the HTTPClient supports HTTP 1.1 request no keep alive requests are 
 
 ## Contributions
 
-Thanks to [colagrosso](http://github.com/colagrosso) for fixing the URL encoding
-Thanks to [hex705](http://github.com/hex705) for properly porting it to Arduino 1.0
+* Thanks to [colagrosso](http://github.com/colagrosso) for fixing the URL encoding
+* Thanks to [hex705](http://github.com/hex705) for properly porting it to Arduino 1.0
 
 ## Copyright and license
 

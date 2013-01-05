@@ -36,35 +36,15 @@ HTTPClient client("api.pachube.com",server,80);
 
 Now you are ready to go.
 
-### Posting request
+### Making a request
 
 HTTP client supports three types of requests:
 
-* Normal GET request to get some data from a URL
-* POST requests to transfer bigger amount of data to a server
-* PUT request as sepcified by REST APIs
-* Currently there is no need for DELETE requests - so they do not exist yet.
+1. `GET` requests to get some data from a URL
+2. `POST` requests to transfer a larger amount of data to a server
+3. `PUT` requests as sepcified by REST APIs
 
-The result of a request is a stream (aka FILE*) by that you can read the data
-without the need to keep the whole answer in memory - which would fail for most
-HTML pages.
-
-FILE* streams are a bit more unusual the normal Arduino streams. They have been 
-choosen since you can use all the nice fprintff and fscanf routines of avr-libc.
-After reading the response from the stream it has to be closed with the method `closeStream(stream)`
-
-**DO NOT FORGET IT**. Each stream has some data attached and if you forget to close the 
-stream you get a memory leak, slowly filling up the precious memory of the Arduino.
-
-The result code of a HTTP request can be read with getLastReturnCode(). It returns a 
-integer containing the return code.  200 indicates that everything was ok.
-For further details refer to http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-
-The HTTPClient has also a debug mode which can be switched on and off by using `debug()`
-with parameter 0 as no debug and anything else Ð e.g. -1 Ð as enabling debug output.
-By default the debug code is disabled. If debug is enabled the complete request and 
-response is printed out on the serial connection. Very useful if your request does
-not work.
+`DELETE` requests have not yet been implemented.
 
 All request take a number of parameters (depending on the request type):
 
@@ -82,7 +62,7 @@ http_client_parameter parameters[] = {
   ,{ NULL,NULL }
 };
 ```
-  
+
 * For POST and PUT request a string with additional data can be passed as a string. The data
   has to be in memory. Future Versions may have future features.
 * For all requests additional headers can be specified. It works exactly the same was as uri
@@ -96,6 +76,36 @@ http_client_parameter pachube_api_header[] = {
 ```
 
 Even though the HTTPClient supports HTTP 1.1 request no keep alive requests are supported currently.
+
+### Handling a response
+
+The result code of a HTTP request can be read with `getLastReturnCode()`. It returns a 
+integer containing the return code. 200 indicates that everything was ok.
+For further details refer to http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+The result of a request is a stream (aka `FILE*`) by that you can read the data
+without the need to keep the whole answer in memory - which would fail for most
+HTML pages.
+
+`FILE*` streams are a bit more unusual the normal Arduino streams. They have been 
+choosen since you can use all the nice fprintff and fscanf routines of avr-libc.
+
+After reading the response from the stream it has to be closed with the method:
+
+```c++
+closeStream(stream)
+```
+
+**DO NOT FORGET IT**. Each stream has some data attached and if you forget to close the 
+stream you get a memory leak, slowly filling up the precious memory of the Arduino.
+
+### Debug mode
+
+The HTTPClient has also a debug mode which can be switched on and off by using `debug()`
+with parameter 0 as no debug and anything else Ð e.g. -1 Ð as enabling debug output.
+By default the debug code is disabled. If debug is enabled the complete request and 
+response is printed out on the serial connection. Very useful if your request does
+not work.
 
 ## Contributions
 

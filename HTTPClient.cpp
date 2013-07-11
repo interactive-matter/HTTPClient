@@ -401,8 +401,8 @@ HTTPClient::skipHeader(FILE* stream)
 {
   //skip over the header
   fscanf_P(stream, PSTR("HTTP/1.1 %i"), &lastReturnCode);
-  static int inByte = 0;
-  static int lastByte = 0;
+  char inByte = '\0';
+  char lastByte = '\0';
   while (!(inByte == '\n' && lastByte == '\n'))
     {
       //by that we ignore \r

@@ -78,7 +78,7 @@ HTTPClient::getURI(char* uri, http_client_parameter parameters[],
   sendUriAndHeaders(result, this->hostName, PSTR("GET"), uri, parameters,
       headers);
   //ok header finished
-  fprintf_P(result, PSTR("\n"));
+  fprintf_P(result, PSTR("\r\n"));
   skipHeader(result);
 
   return result;
@@ -235,7 +235,7 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, const char* requestT
     }
   HTTPClient::setEncoding(stream, 0, 0);
   fprintf_P(stream, PSTR(
-      " HTTP/1.1\nHost: %s\nAccept: */*\nConnection: close\n"), hostName);
+      " HTTP/1.1\r\nHost: %s\r\nAccept: */*\r\nConnection: close\r\n"), hostName);
   //is there an additional header?
   if (headers != NULL)
     {
@@ -244,7 +244,7 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, const char* requestT
         {
           if (headers[headerNumber].value != NULL)
             {
-              fprintf_P(stream, PSTR("%s: %s\n"), headers[headerNumber].name,
+              fprintf_P(stream, PSTR("%s: %s\r\n"), headers[headerNumber].name,
                   headers[headerNumber].value);
 				headerNumber++;
             }
@@ -260,15 +260,15 @@ HTTPClient::sendContentPayload(FILE* stream, char* data)
   int content_length = 0;
   if (data != NULL)
     {
-      content_length = strlen(data);
+      content_length = strlen(data) + 1;
     }
-  fprintf_P(stream, PSTR("Content-Length: %i\n"), content_length);
+  fprintf_P(stream, PSTR("Content-Length: %i\r\n"), content_length);
   //ok finished header
-  fprintf_P(stream, PSTR("\n"));
+  fprintf_P(stream, PSTR("\r\n"));
   //now sending data
   if (content_length > 0)
     {
-      fprintf_P(stream, PSTR("%s\n"), data);
+      fprintf_P(stream, PSTR("%s"), data);
     }
   fprintf_P(stream, PSTR("\n"));
   return 0;

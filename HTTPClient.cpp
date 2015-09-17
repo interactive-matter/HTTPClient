@@ -403,7 +403,7 @@ HTTPClient::skipHeader(FILE* stream)
   int httpReturnCode;
   lastReturnCode = NULL;
   int res=fscanf_P(stream, PSTR("HTTP/1.1 %i"), &httpReturnCode);
-  if ( (res!=1) || (feof(stream)) || (ferror(stream)) ) return NULL;
+  if (res!=1) return NULL;
   lastReturnCode = httpReturnCode; // only set class variable when successfully matched
   char inByte = '\0';
   char lastByte = '\0';

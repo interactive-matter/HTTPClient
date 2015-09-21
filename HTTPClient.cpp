@@ -431,10 +431,7 @@ HTTPClient::closeStream(FILE* stream)
   if (stream != NULL)
     {
       http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
-      if (udata->client->connected())
-        {
-          udata->client->stop();
-        }
+	  udata->client->stop();
       free(udata);
       fclose(stream);
     }

@@ -1,4 +1,29 @@
-# HTTPClient for Arduino
+# HTTPClient for Arduino (Enhanced)
+
+## Not about this version:
+
+This is an enhanced version of the HTTPClient library originally from Interactive-Matter
+(https://github.com/interactive-matter/HTTPClient). Additionally changes from Salanki's 
+fork (https://github.com/salanki/HTTPClient) were incorporated.
+
+The main differences are:
+* The used communication client instance can be specified with new constructors. With 
+  this it can be used with nearly any kind of Client-inherited class (e.g. EthernetClient, 
+  WifiClient, GSMCLient and many more). The old constructor methods without providing a 
+  Client instance are still available and an EthernetClient instance is created then. So 
+  this version should be a drop-in replacement for the original "HTTPClient"
+* Additionally some new constructors were introduced that allow the connection to be 
+  done by just providing the hostname and DHCP is used then. To prevent DNS lookup and 
+  such simply use the original constructor versions where IP is provided additionally 
+  to Hostname - then the IP is used for the connection without the need of a lookup.
+* My optimizations that are in Pull-request #15 on original library are incorporated as 
+  well:
+  * make sure connection is correctly closed at end of communication so that reuse of 
+    one Client instance is possible
+  * check success of parsing for last HTTP returncode and only set the variable on success
+  
+### Open Todos
+* add examples for new Client-Feature ...
 
 ## Overview
 

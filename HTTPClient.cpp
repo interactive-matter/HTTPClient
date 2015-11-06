@@ -203,6 +203,10 @@ char
 HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, const char* requestType, char* uri,
     http_client_parameter parameters[], http_client_parameter headers[])
 {
+  if (stream == NULL)
+  {
+    return 0;
+  }
   fprintf_P(stream, requestType, uri);
   fprintf_P(stream, PSTR(" "), uri);
   //encode but use reserved characters
@@ -256,6 +260,10 @@ HTTPClient::sendUriAndHeaders(FILE* stream, char* hostName, const char* requestT
 char
 HTTPClient::sendContentPayload(FILE* stream, char* data)
 {
+  if (stream == NULL)
+  {
+    return 0;
+  }
   //calculate the content length
   int content_length = 0;
   if (data != NULL)
@@ -402,9 +410,20 @@ HTTPClient::skipHeader(FILE* stream)
   //skip over the header
   int httpReturnCode;
   lastReturnCode = NULL;
+
+  if (stream == NULL) return NULL;
+  http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
+  HTTPClient* client = udata->client;
+
+  int delayReadHeaderCount=0;
+  // check if at least the first HTTP-response available, up to 1000ms=1s
+  while ((client->available()<17) && (delayReadHeaderCount++<HTTPCLIENT_HEADER_READ_DELAY_MAXCOUNT)) 
+     delay(HTTPCLIENT_HEADER_READ_DELAY_ONCE);
+
   int res=fscanf_P(stream, PSTR("HTTP/1.1 %i"), &httpReturnCode);
   if (res!=1) return NULL;
-  lastReturnCode = httpReturnCode; // only set class variable when successfully matched
+  lastReturnCode = httpReturnCode; // only set class variable when successfully matched, else it is NULL
+  
   char inByte = '\0';
   char lastByte = '\0';
   while (!(inByte == '\n' && lastByte == '\n'))

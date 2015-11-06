@@ -26,7 +26,14 @@
 #define HTTPCLIENT_H_
 
 #include <inttypes.h>
-#include "EthernetClient.h"
+#include <EthernetClient.h>
+
+/* With this we try a delay of 20 ms before checking again if content is available
+ * and we try this up to 50 times.
+ * So max: 20x50ms=1000ms=1s
+ */
+#define HTTPCLIENT_HEADER_READ_DELAY_ONCE 20
+#define HTTPCLIENT_HEADER_READ_DELAY_MAXCOUNT 50
 
 /* This struct is used to pass parameters as URI paramters and additional HTTP headers.
  * normally you pass this as a array. The last entry must have the NULL-Pointer as name.

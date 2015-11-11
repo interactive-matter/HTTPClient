@@ -26,8 +26,7 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 #include <HardwareSerial.h>
-#include "HTTPClient.h"
-#include "EthernetClient.h"
+#include <HTTPClient.h>
 
 //a struct to store the uriEncoder & the handle to the http client
 typedef struct

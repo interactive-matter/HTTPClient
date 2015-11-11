@@ -27,6 +27,7 @@
 
 #include <inttypes.h>
 #include <Client.h>
+#include <EthernetClient.h>
 
 /* With this we try a delay of 20 ms before checking again if content is available
  * and we try this up to 50 times.

@@ -26,7 +26,7 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 #include <HardwareSerial.h>
-#include "HTTPClient.h"
+#include <HTTPClient.h>
 
 //a struct to store the uriEncoder & the handle to the http client
 typedef struct
@@ -41,16 +41,56 @@ typedef struct
 #define URI_ALLOWED(byte) ((byte>='A' && byte<='Z') || (byte>='a' && byte<='z') || (byte>='0' && byte<='9') || byte == '-' || byte == '_' || byte == '.' || byte == '~')
 #define URI_RESERVED(byte) (byte == '!' || byte == '*' || byte == '\'' || byte == '(' || byte == ')' || byte == ';' || byte == ':' || byte == '&' || byte == '=' || byte == '+' || byte == '$' || byte == ',' || byte == '/' || byte == '?' || byte == '#' || byte == '[' || byte == ']')
 
+HTTPClient::HTTPClient(char* host) :
+    _theClient(new EthernetClient()), _selfInitializedTheClient(true), hostName(host), debugCommunication(0), _useIp(false), port(80)
+{
+  //nothing else to do
+}
+
+HTTPClient::HTTPClient(char* host, uint16_t port) :
+    _theClient(new EthernetClient()), _selfInitializedTheClient(true), hostName(host), debugCommunication(0), _useIp(false), port(port)
+{
+  //nothing else to do
+}
+
 HTTPClient::HTTPClient(char* host, uint8_t* ip) :
-    EthernetClient(), hostName(host), debugCommunication(0), ip(ip), port(80)
+    _theClient(new EthernetClient()), _selfInitializedTheClient(true), hostName(host), debugCommunication(0), ip(ip), _useIp(true), port(80)
 {
   //nothing else to do
 }
 
 HTTPClient::HTTPClient(char* host, uint8_t* ip, uint16_t port) :
-    EthernetClient(), hostName(host), debugCommunication(0), ip(ip), port(port)
+    _theClient(new EthernetClient()), _selfInitializedTheClient(true), hostName(host), debugCommunication(0), ip(ip), _useIp(true), port(port)
 {
   //nothing else to do
+}
+
+HTTPClient::HTTPClient(Client& client, char* host) :
+    _theClient(&client), hostName(host), debugCommunication(0), _useIp(false), port(80)
+{
+  //nothing else to do
+}
+
+HTTPClient::HTTPClient(Client& client, char* host, uint16_t port) :
+    _theClient(&client), hostName(host), debugCommunication(0), _useIp(false), port(port)
+{
+  //nothing else to do
+}
+
+HTTPClient::HTTPClient(Client& client, char* host, uint8_t* ip) :
+    _theClient(&client), hostName(host), debugCommunication(0), ip(ip), _useIp(true), port(80)
+{
+  //nothing else to do
+}
+
+HTTPClient::HTTPClient(Client& client, char* host, uint8_t* ip, uint16_t port) :
+    _theClient(&client), hostName(host), debugCommunication(0), ip(ip), _useIp(true), port(port)
+{
+  //nothing else to do
+}
+
+HTTPClient::~HTTPClient() {
+  if (_selfInitializedTheClient) delete _theClient;
 }
 
 FILE*
@@ -184,11 +224,12 @@ HTTPClient::openClientFile()
   fdev_set_udata(result,udata);
   udata->client = this;
   udata->encode = 0;
-  if (connected())
-    {
-      stop();
-    }
-  if (connect(ip,port))
+  _theClient->stop();
+
+  int connectRes;
+  if (_useIp) connectRes=_theClient->connect(ip,port);
+    else connectRes=_theClient->connect(hostName,port);
+  if (connectRes)
     {
       return result;
     }
@@ -291,14 +332,14 @@ HTTPClient::clientWrite(char byte, FILE* stream)
     }
   http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
   HTTPClient* client = udata->client;
-  if (client->connected() == 0)
+  if (client->_theClient->connected() == 0)
     {
       closeStream(stream);
       return EOF;
     }
   if (udata->encode == 0)
     {
-      client->write(byte);
+      client->_theClient->write(byte);
       if (client->debugCommunication)
         {
           Serial.print(byte);
@@ -309,7 +350,7 @@ HTTPClient::clientWrite(char byte, FILE* stream)
       if (URI_ALLOWED(byte) || ((URI_RESERVED(byte) && (udata->encode
           & URI_ENCODE_RESERVED) == 0)))
         {
-          client->write(byte);
+          client->_theClient->write(byte);
           if (client->debugCommunication)
             {
               Serial.print(byte);
@@ -323,7 +364,7 @@ HTTPClient::clientWrite(char byte, FILE* stream)
           // Write only the first three bytes, not the trailing null
           for (char i = 0; i < 3; i++)
             {
-              client->write(encoded[i]);
+              client->_theClient->write(encoded[i]);
               if (client->debugCommunication)
                 {
                   Serial.print(encoded[i]);
@@ -343,19 +384,19 @@ HTTPClient::clientRead(FILE* stream)
     }
   http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
   HTTPClient* client = udata->client;
-  if (!client->connected())
+  if (!client->_theClient->connected())
     {
       return EOF;
     }
   //block until we got a byte
-  while (client->available() == 0)
+  while (client->_theClient->available() == 0)
     {
-      if (client->connected() == 0)
+      if (client->_theClient->connected() == 0)
         {
           return EOF;
         }
     };
-  int result = client->read();
+  int result = client->_theClient->read();
   if (result == EOF)
     {
       return EOF;
@@ -372,9 +413,9 @@ HTTPClient::clientRead(FILE* stream)
   else
     {
       //block until we got the needed bytes
-      while (client->available() >= 2)
+      while (client->_theClient->available() >= 2)
         {
-          if (client->connected() == 0)
+          if (client->_theClient->connected() == 0)
             {
               return EOF;
             }
@@ -382,7 +423,7 @@ HTTPClient::clientRead(FILE* stream)
       char return_value = 0;
       for (char i = 0; i < 2; i++)
         {
-          result = client->read();
+          result = client->_theClient->read();
           if (result == EOF)
             {
               return EOF;
@@ -417,7 +458,7 @@ HTTPClient::skipHeader(FILE* stream)
 
   int delayReadHeaderCount=0;
   // check if at least the first HTTP-response available, up to 1000ms=1s
-  while ((client->available()<17) && (delayReadHeaderCount++<HTTPCLIENT_HEADER_READ_DELAY_MAXCOUNT)) 
+  while ((client->_theClient->available()<17) && (delayReadHeaderCount++<HTTPCLIENT_HEADER_READ_DELAY_MAXCOUNT)) 
      delay(HTTPCLIENT_HEADER_READ_DELAY_ONCE);
 
   int res=fscanf_P(stream, PSTR("HTTP/1.1 %i"), &httpReturnCode);
@@ -450,7 +491,7 @@ HTTPClient::closeStream(FILE* stream)
   if (stream != NULL)
     {
       http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
-	  udata->client->stop();
+      udata->client->_theClient->stop();
       free(udata);
       fclose(stream);
     }

@@ -409,9 +409,9 @@ HTTPClient::skipHeader(FILE* stream)
 {
   //skip over the header
   int httpReturnCode;
-  lastReturnCode = NULL;
+  lastReturnCode = -1;
 
-  if (stream == NULL) return NULL;
+  if (stream == NULL) return -1;
   http_stream_udata* udata = (http_stream_udata*) fdev_get_udata(stream);
   HTTPClient* client = udata->client;
 
@@ -421,7 +421,7 @@ HTTPClient::skipHeader(FILE* stream)
      delay(HTTPCLIENT_HEADER_READ_DELAY_ONCE);
 
   int res=fscanf_P(stream, PSTR("HTTP/1.1 %i"), &httpReturnCode);
-  if (res!=1) return NULL;
+  if (res!=1) return -1;
   lastReturnCode = httpReturnCode; // only set class variable when successfully matched, else it is NULL
   
   char inByte = '\0';
@@ -438,7 +438,7 @@ HTTPClient::skipHeader(FILE* stream)
         {
           //hmm, an error occured - lets just end this
           HTTPClient::closeStream(stream);
-          return NULL;
+          return -1;
         }
     }
   return 0;
